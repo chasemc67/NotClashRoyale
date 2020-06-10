@@ -14,7 +14,7 @@ enum CharacterState {
 public class CharacterActiveController : MonoBehaviour
 {
     CharacterController characterController;
-
+    Animator animatorController;
     CharacterState currentState;
     float speed = 1f;
 
@@ -22,7 +22,17 @@ public class CharacterActiveController : MonoBehaviour
     void Start()
     {
         characterController = GetComponent<CharacterController>();
+        animatorController = GetComponent<Animator>();
         currentState = CharacterState.Walking;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        // characterController has its own collider so have to check its not that one
+        if (other.gameObject.tag == "characterUnit" && other.gameObject != this.gameObject) {
+            currentState = CharacterState.Attacking;
+            animatorController.SetBool("attacking", true);
+        }
     }
 
     // Update is called once per frame
@@ -30,7 +40,7 @@ public class CharacterActiveController : MonoBehaviour
     {
         switch(currentState) {
             case CharacterState.Walking:
-            characterController.SimpleMove(transform.TransformDirection(Vector3.forward) * speed);
+                characterController.SimpleMove(transform.TransformDirection(Vector3.forward) * speed);
                 break;
             case CharacterState.Homing:
                 break;
